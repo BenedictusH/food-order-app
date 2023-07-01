@@ -1,16 +1,17 @@
-import { Card as BaseCard, Box, CardContent, Typography, CardMedia, Button } from "@mui/material"
+import { Card as BaseCard, CardProps, Box, CardContent, Typography, CardMedia, Button } from "@mui/material"
 
-type props = {
+interface ComponentProps extends CardProps {
     name: string,
     price: number,
-    onButtonClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number) => void
+    onButtonClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export default function Card({
     name,
     price,
-    onButtonClick
-}: props) {
+    onButtonClick,
+    ...props
+}: ComponentProps) {
     return (
         <BaseCard className='flex' elevation={3}>
             <Box className='flex flex-col p-2' sx={{ width: 300 }}>

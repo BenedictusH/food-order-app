@@ -15,7 +15,7 @@ import { title } from 'process';
 interface ComponentProps extends DialogProps {
     onCloseClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
     title?: string,
-    renderItems: React.ReactElement
+    renderContent: React.ReactElement
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -27,7 +27,7 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export function FullScreenDialog({ onCloseClick, title, renderItems, ...props }: ComponentProps) {
+export function FullScreenDialog({ onCloseClick, title, renderContent, ...props }: ComponentProps) {
 
     return (
         <BaseDialog
@@ -51,7 +51,7 @@ export function FullScreenDialog({ onCloseClick, title, renderItems, ...props }:
                 </Toolbar>
             </AppBar>
             <>
-                {renderItems}
+                {renderContent}
             </>
         </BaseDialog>
     );

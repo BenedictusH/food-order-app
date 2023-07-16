@@ -163,6 +163,7 @@ export default function Demo() {
         name: string,
         customization: string[],
         addOns: string[],
+        notes: string,
         totalPrice: number
     }
 
@@ -174,6 +175,7 @@ export default function Demo() {
         name: '',
         customization: [],
         addOns: [],
+        notes: '',
         totalPrice: 0,
     })
 
@@ -206,6 +208,13 @@ export default function Demo() {
                 totalPrice: currentOrder.totalPrice + price
             })
         }
+    }
+
+    const handleNotesChange = (text: string) => {
+        setCurrentOrder({
+            ...currentOrder,
+            notes: text
+        })
     }
 
     const handleSaveOrder = () => {
@@ -284,7 +293,15 @@ export default function Demo() {
                             </>)}
                         </List>
                     </>}
-                    <ListItem className='flex justify-end'>
+                    <Typography variant='h5' className='p-4'>
+                        Add Some Special Notes (optional)
+                    </Typography>
+                    <ListItem>
+                        <TextField
+                            multiline rows={3} placeholder='Some Special Notes' variant='outlined' fullWidth
+                            onChange={(e) => handleNotesChange(e.target.value)} />
+                    </ListItem>
+                    <ListItem className='flex justify-end mt-4'>
                         ${currentOrder.totalPrice}
                         <Button onClick={handleSaveOrder} variant='contained' color='secondary' className='ml-4'>Submit</Button>
                     </ListItem>
@@ -360,6 +377,7 @@ export default function Demo() {
                                 <ListItem className='font-bold'>{order.name}</ListItem>
                                 {order.customization.length > 0 && <ListItem>Notes: {order.customization.map((option) => `${option}, `)}</ListItem>}
                                 {order.addOns.length > 0 && <ListItem>Add Ons: {order.addOns.map((option) => `${option}, `)}</ListItem>}
+                                {order.notes !== '' && <ListItem>Special Notes: {order.notes}</ListItem>}
                                 <ListItem>Price: {order.totalPrice}</ListItem>
                                 <Divider />
                             </List>)}

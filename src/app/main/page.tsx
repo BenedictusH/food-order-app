@@ -3,20 +3,16 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Grid, Typography, List, ListItem, Divider, Button, Checkbox, FormControlLabel, FormControl, FormGroup, FormLabel, TextField } from '@mui/material'
+import { Grid, Typography, List, ListItem, Divider, Button, Checkbox, FormControlLabel, FormControl, FormGroup, FormLabel, TextField, Fab, Box } from '@mui/material'
 import { styled } from '@mui/system';
 import { Controller, useForm } from 'react-hook-form';
 
 import Card from '../components/card';
 import { FullScreenDialog } from '../components/dialog';
 
-import Box from '@mui/material/Box';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import { Console } from 'console';
-import { type } from 'os';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import theme from '../../../public/theme';
+import Slider from '@mui/material/Slider';
 
 interface data {
     id: number,
@@ -106,7 +102,7 @@ const DUMMYDATA = [{
     ]
 }, {
     "id": 8,
-    "name": "ALfredo Pasta",
+    "name": "Alfredo Pasta",
     "price": 60,
     "category": "mains",
     "group": "pasta",
@@ -172,7 +168,8 @@ export default function Demo() {
 
     const [showModal, setShowModal] = useState<number | null>(null)
     const [orders, setOrders] = useState<Order[]>([])
-    const [currentOrder, setCurrentOrder] = useState({
+    const [showOrder, setShowOrder] = useState(false)
+    const [currentOrder, setCurrentOrder] = useState<Order>({
         id: 0,
         name: '',
         customization: [],
@@ -302,18 +299,31 @@ export default function Demo() {
         console.log(orders)
     }
 
-    const handleModalOpen = (id: number, name: string, price: number) => {
-        setShowModal(id)
-        setCurrentOrder({
+    const handleAddClick = <T extends data>(menuItem: T) => {
+        setShowModal(menuItem.id)
+        //pasing the item that is selected and add the correct id to the order
+        let newOrder = {
             ...currentOrder,
             id: orders.length === 0 ? 1 : orders.length + 1,
-            name: name,
-            totalPrice: price
-        })
+            name: menuItem.name,
+            totalPrice: menuItem.price
+        }
+        setCurrentOrder(newOrder)
+
+        // case if order does not have any customization order instanlty added, uses same code form handleSaveOrder, cant be use same function bcs of state problems
+        if (menuItem.customization.length === 0) {
+            let order: Order = { ...newOrder }
+            setOrders([...orders, order])
+            handleModalClose()
+        }
+        else {
+            return
+        }
     }
 
     const handleModalClose = () => {
         setShowModal(null)
+        // clear curent order
         setCurrentOrder({
             id: 0,
             name: '',
@@ -323,8 +333,57 @@ export default function Demo() {
         })
     }
 
+    const handleGetTotalPrice = () => {
+        let totalPrice = 0
+        orders.map((order) => (totalPrice += order.totalPrice))
+        return totalPrice;
+    }
+
     return (
         <main style={{ height: '200vh' }}>
+            <Fab color='secondary' sx={{
+                position: 'fixed',
+                bottom: theme.spacing(2),
+                right: theme.spacing(2),
+            }}
+                onClick={() => setShowOrder(true)}>
+                <ReceiptIcon />
+            </Fab>
+            <FullScreenDialog
+                onCloseClick={() => setShowOrder(false)}
+                open={showOrder}
+                title='Current Order'
+                renderContent={<>
+                    {orders.length > 0 && <Box className='h-full'>
+                        <Box className='max-h-fit' style={{ minHeight: '87%' }}>
+                            {orders.map((order, index) => <List key={index}>
+                                <ListItem className='font-bold'>{order.name}</ListItem>
+                                {order.customization.length > 0 && <ListItem>Notes: {order.customization.map((option) => `${option}, `)}</ListItem>}
+                                {order.addOns.length > 0 && <ListItem>Add Ons: {order.addOns.map((option) => `${option}, `)}</ListItem>}
+                                <ListItem>Price: {order.totalPrice}</ListItem>
+                                <Divider />
+                            </List>)}
+                        </Box>
+                        <Box className='flex justify-end mt-4' style={{ height: '10%' }}>
+                            <List>
+                                <ListItem>
+                                    <Typography className='font-bold'>
+                                        ${handleGetTotalPrice()}
+                                    </Typography>
+                                    <Button variant='contained' className='ml-4' onClick={() => console.log(orders)}>
+                                        Submit
+                                    </Button>
+                                </ListItem>
+                            </List>
+                        </Box>
+                    </Box>}
+                    {orders.length === 0 && <Box className='h-full w-full flex justify-center items-center text-gray-500 font-bold'>
+                        <Typography>
+                            No Orders Yet. Add Some Orders!
+                        </Typography>
+                    </Box>}
+                </>}
+            ></FullScreenDialog>
             <FixedBackground>
                 <Typography variant='h3' className='font-bold backdrop-brightness-50 backdrop-blur-md text-white h-full w-full flex justify-center items-center'>
                     Order Now
@@ -333,10 +392,10 @@ export default function Demo() {
             <Button onClick={handleClick}> Data Test Button</Button>
             <Grid
                 container direction='column' justifyContent='center' alignItems='center' rowSpacing={2}
-                className='p-8 md:px-24 min-h-screen m-0'>
+                className='p-4 md:px-24 min-h-screen m-0'>
                 {DUMMYDATA.map((item) =>
                     <Grid item key={item.id}>
-                        <Card name={item.name} price={item.price} onButtonClick={() => handleModalOpen(item.id, item.name, item.price)}></Card>
+                        <Card name={item.name} price={item.price} onButtonClick={() => handleAddClick(item)}></Card>
                         {renderModal(item)}
                     </Grid>)}
             </Grid>

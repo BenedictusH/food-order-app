@@ -17,8 +17,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <CssBaseline />
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <body>{children}</body>
       </ThemeProvider>
     </html>

@@ -13,8 +13,13 @@ export default function Card({
     ...props
 }: ComponentProps) {
     return (
-        <BaseCard className='flex' elevation={3}>
-            <Box className='flex flex-col p-2' sx={{ width: 300 }}>
+        <BaseCard className='flex' elevation={3} sx={{
+            width: 500,
+            '@media (max-width: 600px)': {
+                width: 300,
+            }
+        }}>
+            <Box className='flex flex-col p-2 w-2/3'>
                 <CardContent className='flex flex-col'>
                     <Typography component="div" variant="h5">
                         {name}
@@ -31,9 +36,10 @@ export default function Card({
             </Box>
             <CardMedia
                 component="img"
-                sx={{ width: 151 }}
+                sx={{ width: 'auto' }}
                 image="https://placehold.co/151"
                 alt="Live from space album cover"
+                className="w-1/3"
             />
         </BaseCard >
     )

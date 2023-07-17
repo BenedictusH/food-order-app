@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Grid, Typography, List, ListItem, Divider, Button, Checkbox, FormControlLabel, FormControl, FormGroup, FormLabel, TextField, Fab, Box } from '@mui/material'
+import { Grid, Typography, List, ListItem, Divider, Button, Checkbox, FormControlLabel, Alert, TextField, Fab, Box, Fade } from '@mui/material'
 import { styled } from '@mui/system';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -168,6 +168,7 @@ export default function Demo() {
     }
 
     const [showModal, setShowModal] = useState<number | null>(null)
+    const [showAlert, setShowAlert] = useState(false)
     const [orders, setOrders] = useState<Order[]>([])
     const [showOrder, setShowOrder] = useState(false)
     const [currentOrder, setCurrentOrder] = useState<Order>({
@@ -221,6 +222,11 @@ export default function Demo() {
         let newOrder: Order = { ...currentOrder }
         setOrders([...orders, newOrder])
         handleModalClose()
+        setShowAlert(true)
+
+        setTimeout(() => {
+            setShowAlert(false);
+        }, 2000);
     }
     //only render modal if item has customization
     const renderModal = <T extends data>(menuItem: T) => {
@@ -310,12 +316,6 @@ export default function Demo() {
         }
     }
 
-    const handleClick = () => {
-        console.log(DUMMYDATA_APPETIZERS)
-        console.log('===ORDERS===')
-        console.log(orders)
-    }
-
     const handleAddClick = <T extends data>(menuItem: T) => {
         setShowModal(menuItem.id)
         //pasing the item that is selected and add the correct id to the order
@@ -332,6 +332,11 @@ export default function Demo() {
             let order: Order = { ...newOrder }
             setOrders([...orders, order])
             handleModalClose()
+            setShowAlert(true)
+
+            setTimeout(() => {
+                setShowAlert(false);
+            }, 3000);
         }
         else {
             return
@@ -366,13 +371,19 @@ export default function Demo() {
                 onClick={() => setShowOrder(true)}>
                 <ReceiptIcon />
             </Fab>
+            <Box className='w-screen h-screen flex justify-center items-end fixed' sx={{
+            }}>
+                <Fade in={showAlert} timeout={500} mountOnEnter unmountOnExit>
+                    <Alert variant='filled' className='h-12 z-20 mb-4'>Order Added Succesfully</Alert>
+                </Fade>
+            </Box>
             <FullScreenDialog
                 onCloseClick={() => setShowOrder(false)}
                 open={showOrder}
                 title='Current Order'
                 renderContent={<>
                     {orders.length > 0 && <Box className='h-full'>
-                        <Box className='max-h-fit' style={{ minHeight: '87%' }}>
+                        <Box className='max-h-fit' sx={{ minHeight: '87%' }}>
                             {orders.map((order, index) => <List key={index}>
                                 <ListItem className='font-bold'>{order.name}</ListItem>
                                 {order.customization.length > 0 && <ListItem>Notes: {order.customization.map((option) => `${option}, `)}</ListItem>}
@@ -382,7 +393,7 @@ export default function Demo() {
                                 <Divider />
                             </List>)}
                         </Box>
-                        <Box className='flex justify-end mt-4' style={{ height: '10%' }}>
+                        <Box className='flex justify-end mt-4' sx={{ height: '10%' }}>
                             <List>
                                 <ListItem>
                                     <Typography className='font-bold'>
@@ -407,7 +418,6 @@ export default function Demo() {
                     Order Now
                 </Typography>
             </FixedBackground>
-            <Button onClick={handleClick}> Data Test Button</Button>
             <Grid
                 container direction='column' justifyContent='center' alignItems='center' rowSpacing={2}
                 className='p-4 md:px-24 min-h-screen m-0'>
